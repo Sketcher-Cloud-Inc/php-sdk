@@ -1,0 +1,16 @@
+{
+    "name": "sketcher-cloud-inc/php-sdk",
+    "description": "Official SDK for php",
+    "require-dev": {
+        "symfony/var-dumper": "5.1.5"
+    },
+    "license": "GPL-v3.0",
+    "authors": [
+        {
+            "name": "Simon Malpel",
+            "email": "simon.malpel@orange.fr"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {}
+}
