@@ -9,7 +9,7 @@
     "require-dev": {
         "symfony/var-dumper": "5.1.5"
     },
-    "license": "GPL-v3.0",
+    "license": "AGPL-3.0-or-later",
     "authors": [
         {
             "name": "Simon Malpel",
