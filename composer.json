@@ -1,6 +1,11 @@
 {
     "name": "sketcher-cloud-inc/php-sdk",
     "description": "Official SDK for php",
+    "autoload": {
+        "psr-4": {
+            "Sketcher\\SDK\\": "src/"
+        }
+    },
     "require-dev": {
         "symfony/var-dumper": "5.1.5"
     },
@@ -12,5 +17,7 @@
         }
     ],
     "minimum-stability": "stable",
-    "require": {}
+    "require": {
+        "guzzlehttp/guzzle": "^7.0"
+    }
 }
