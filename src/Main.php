@@ -3,6 +3,7 @@
 namespace Sketcher\SDK;
 
 use GuzzleHttp\Client;
+use \GuzzleHttp\Exception\RequestException;
 
 class Main {
 
@@ -60,7 +61,10 @@ class Main {
             if (!empty($ObjectResponse) && $ObjectResponse->type == "SUCCESS") {
                 return $ObjectResponse->response;
             } else {
-                throw new \Exception((!empty($ObjectResponse->type)? $ObjectResponse->type: "Unknown error, please check your local configuration and retry. if the message persists check the servers status."));
+                throw new \Sketcher\SDK\Exception (
+                    (!empty($ObjectResponse->type)? $ObjectResponse->type: "Unknown error, please check your local configuration and retry. if the message persists check the servers status."),
+                    $ObjectResponse
+                );
                 return;
             }
         }
@@ -75,17 +79,21 @@ class Main {
      * @return void
      */
     private function MakingHttp(string $method,string $HttpUri, array $BodyContent): ?object {
-        $HttpRequest    = new Client([
-            "base_uri"  => $this->BASE_URI,
-            "headers"   => [
-                "Content-Type" => "application/json"
-            ]
-        ]);
-        $HttpResponse   = $HttpRequest->request($method, "/{$HttpUri}", [
-            "body" => json_encode($BodyContent)
-        ]);
-        $HttpResponse   = $HttpResponse->getBody()->getContents();
-        $HttpResponse   = (!empty($HttpResponse)? json_decode($HttpResponse, false): null);
+        try {
+            $HttpRequest    = new Client([
+                "base_uri"  => $this->BASE_URI,
+                "headers"   => [
+                    "Content-Type" => "application/json"
+                ]
+            ]);
+            $HttpResponse   = $HttpRequest->request($method, "/{$HttpUri}", [
+                "body" => json_encode($BodyContent)
+            ]);
+            $HttpResponse   = $HttpResponse->getBody()->getContents();
+        } catch (RequestException $e) {
+            $HttpResponse = $e->getResponse()->getBody()->getContents();
+        }
+        $HttpResponse = (!empty($HttpResponse)? json_decode($HttpResponse, false): null);
         return $HttpResponse;
     }
 
