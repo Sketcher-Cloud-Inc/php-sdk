@@ -7,14 +7,18 @@ use \GuzzleHttp\Exception\RequestException;
 
 class Main {
 
+    public  $ResponseException;
     private $BASE_URI;
     private $USE_HTTPS;
     private $AppToken;
+    private $debug;
 
     public function __construct() {
-        $this->BASE_URI     = null;
-        $this->USE_HTTPS    = null;
-        $this->AppToken     = null;
+        $this->ResponseException    = null;
+        $this->BASE_URI             = null;
+        $this->USE_HTTPS            = null;
+        $this->AppToken             = null;
+        $this->debug                = true;
     }
 
     /**
@@ -28,6 +32,17 @@ class Main {
         [$USE_HTTPS, $BASE_URI]     = \explode("://", $BASE_URI);
         $this->BASE_URI             = "{$USE_HTTPS}://{$BASE_URI}/";
         $this->USE_HTTPS            = ($USE_HTTPS == "https"? true: false);
+        return;
+    }
+
+    /**
+     * Toggle debug mode
+     *
+     * @param  bool $toggle
+     * @return void
+     */
+    public function SetDebugMode(bool $toggle): void {
+        $this->debug = $toggle;
         return;
     }
         
@@ -50,7 +65,8 @@ class Main {
      * @param  array $Parameters
      * @return void
      */
-    public function Request(string $method, string $URI, array $Parameters = []) {
+    public function Request(string $method, string $URI, array $Parameters = [], bool $debug = null) {
+        $debug = (!empty($debug) || $debug === false? $debug: $this->debug);
         if (!empty($this->BASE_URI)) {
             $URI            = trim($URI, "/");
             $BodyContent    = [
@@ -61,11 +77,16 @@ class Main {
             if (!empty($ObjectResponse) && $ObjectResponse->type == "SUCCESS") {
                 return $ObjectResponse->response;
             } else {
-                throw new \Sketcher\SDK\Exception (
-                    (!empty($ObjectResponse->type)? $ObjectResponse->type: "Unknown error, please check your local configuration and retry. if the message persists check the servers status."),
-                    $ObjectResponse
-                );
-                return;
+                $Exception = (!empty($ObjectResponse->type)? $ObjectResponse->type: "Unknown error, please check your local configuration and retry. if the message persists check the servers status.");
+                $this->ResponseException = $Exception;
+                if ($debug) {
+                    throw new \Sketcher\SDK\Exception (
+                        $Exception,
+                        $ObjectResponse
+                    );
+                    return;
+                }
+                return false;
             }
         }
     }
